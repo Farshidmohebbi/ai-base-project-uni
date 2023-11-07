@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fastapi
+  namespace: default
+  labels:
+    app: fastapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: fastapi
+  template:
+    metadata:
+      labels:
+        name: fastapi
+        tier: backend
+    spec:
+      containers:
+        - name: fastapi
+          image: fastapi_app:latest
+          imagePullPolicy: IfNotPresent
+          command: ["/bin/sh"]
+          args: ["-c", "uvicorn main:app --host 0.0.0.0 --port 8000"]
+          ports:
+            - containerPort: 8000
+          resources:
+            limits:
+              memory: 1024Mi
+              cpu: "1000m"
+            requests:
+              memory: 1500Mi
+              cpu: "1500m"
+
+          volumeMounts:
+            - name: temp-volume-mount
+              mountPath: /usr/src/app/temp
+
+      volumes:
+        - name: temp-volume-mount
+          emptyDir: {}
